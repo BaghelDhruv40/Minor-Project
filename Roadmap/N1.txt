@@ -1,0 +1,43 @@
+Okay let me tell you in detail what is happening in the project. I will include the purpose and functionalities of only those libraries which I'm aware of. yu can yourself add such things for rest of the libraries used according to the backend and frontend code I'm gonna send you.
+
+The project structure is like this:
+
+    I've a folder named "Minor Project" (This is not relevant to the project purpose).
+
+    Inside this folder, I've a folder named Backend.
+
+    Inside this Backend folder, I've three things:
+    
+        -> .venv named folder.
+        -> src named folder.
+        -> .env file containing two things:
+
+            -> Flask_APP=src/app.py
+            -> Flask_DEBUG=1
+        
+        -> Inside src named folder, I've these things:
+
+            -> app.py
+            -> templates named folder.
+            -> static named folder.
+            -> kmeans_model.joblib file.
+
+Now, let me tell you the tech stack:
+
+    Python is used as the language and we are using Flask.
+
+    Further, some libraries are used. These includes:
+
+        -> numpy, pandas, seaborn, matplotlib, scikit-learn
+
+        -> python-dotenv, flask_cors (not required for current project structure but is there for future changes).
+
+
+Now, I'm telling about the overall workflow. The detailed workflow can be grasped by you when look in to the code. So,
+
+    -> We have an 'index.html' file in the templates folder. This file consist of the HTML, CSS and JS code regarding the form that will let the user upload the file.
+    On submission of the file, the form sends the formdata to routes handlers defined in app.py.
+
+    -> Now comes the role of app.py. This file is the flask app that consists of functions that will load and clean the uploaded file, preprocess the uploaded file. Then the work is done on the file to produce the out put as images that are then stored in the 'static' folder.
+
+I've given here the high order overview of the whole project work flow, I request you to make this work flow as much detailed as possible as create a technical writing report on this.
