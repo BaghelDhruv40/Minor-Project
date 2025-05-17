@@ -1,21 +1,18 @@
 from dotenv import load_dotenv
 load_dotenv()
-from flask_cors import CORS
+
 from flask import Flask, request, jsonify, render_template
 import joblib  # Changed from pickle to joblib
-import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
+
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import json
 
 app = Flask(__name__)
-CORS(app)
+
 
 model = joblib.load(os.path.join(os.path.dirname(__file__), 'kmeans_model.joblib'))
   # Modified to use joblib.load
