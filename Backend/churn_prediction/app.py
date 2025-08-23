@@ -11,7 +11,7 @@ app = Flask(__name__)
 # Load ANN churn model
 model = tf.keras.models.load_model(os.path.join(os.path.dirname(__file__), 'churn_model.h5'))
 
-@app.route('/')
+@app.route('/') # Ignore this route for now. Instead of a separate route, button based trigger will be implemented from the main home page. This route was for testing. To test this module, explicitly run this flask app!!
 def home():
     return render_template('churn.html')
 
