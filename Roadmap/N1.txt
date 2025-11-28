@@ -40,4 +40,27 @@ Now, I'm telling about the overall workflow. The detailed workflow can be graspe
 
     -> Now comes the role of app.py. This file is the flask app that consists of functions that will load and clean the uploaded file, preprocess the uploaded file. Then the work is done on the file to produce the out put as images that are then stored in the 'static' folder.
 
-I've given here the high order overview of the whole project work flow, I request you to make this work flow as much detailed as possible as create a technical writing report on this.
+Minor Project (folder)
+
+    Backend (folder)
+
+        .venv (folder)
+        churn_prediction (folder)
+
+            static (folder)
+            templates (folder)
+                churn.html
+
+            app.py
+            churn_model.h5
+
+        src (folder)
+            static (folder)
+            templates (folder)
+            app.py
+            kmeans_model.joblib
+            utils.py
+        
+        .env
+        .gitignore
+

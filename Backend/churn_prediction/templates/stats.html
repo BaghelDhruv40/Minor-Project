@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Churn Prediction</title>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body class="p-4">
+		<div class="container">
+			<h1 class="mb-4 text-center">Customer Churn Prediction</h1>
+
+			<form id="uploadForm" enctype="multipart/form-data" class="mb-4">
+				<div class="input-group">
+					<input
+						type="file"
+						name="file"
+						accept=".csv"
+						class="form-control"
+						required />
+					<button type="submit" class="btn btn-primary">Predict Churn</button>
+				</div>
+			</form>
+
+			<div id="result" class="mb-4 text-center"></div>
+
+			<!-- Graph Section -->
+			<!-- <div class="row">
+				<div class="col-md-6">
+					<canvas id="churnPieChart"></canvas>
+				</div>
+				<div class="col-md-6">
+					<canvas id="probabilityHistogram"></canvas>
+				</div>
+			</div> -->
+			<div class="row">
+				<div class="col-md-4">
+					<canvas id="churnPieChart"></canvas>
+				</div>
+				<div class="col-md-4">
+					<canvas id="probabilityHistogram"></canvas>
+				</div>
+				<div class="col-md-4">
+					<canvas id="churnLabelPerCustomer"></canvas>
+				</div>
+			</div>
+
+			<!-- Table Section -->
+			<div id="tableSection" class="mt-5"></div>
+		</div>
+
+		<script>
+			const form = document.getElementById("uploadForm");
+			const resultDiv = document.getElementById("result");
+			const tableSection = document.getElementById("tableSection");
+
+			let churnPieChart, probabilityHistogram, churnLabelPerCustomer;
+
+			form.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				const formData = new FormData(form);
+
+				resultDiv.innerHTML =
+					"<div class='alert alert-info'>Processing...</div>";
+
+				const response = await fetch("/predict", {
+					method: "POST",
+					body: formData,
+				});
+
+				const data = await response.json();
+
+				if (data.length === 0) {
+					resultDiv.innerHTML =
+						"<div class='alert alert-warning'>No data returned.</div>";
+					return;
+				}
+
+				resultDiv.innerHTML =
+					"<div class='alert alert-success'>Prediction Completed!</div>";
+
+				// Build Table
+				const columns = Object.keys(data[0]);
+
+				let tableHTML = `<table class="table table-bordered table-striped">
+                                <thead class="table-dark">
+                                    <tr>${columns
+																			.map((col) => `<th>${col}</th>`)
+																			.join("")}</tr>
+                                </thead>
+                                <tbody>`;
+				data.forEach((row) => {
+					tableHTML += `<tr>${columns
+						.map((col) => `<td>${row[col]}</td>`)
+						.join("")}</tr>`;
+				});
+				tableHTML += "</tbody></table>";
+				tableSection.innerHTML = tableHTML;
+
+				// Prepare chart data
+				const churnCounts = { churn: 0, noChurn: 0 };
+				const probabilities = [];
+				const churnLabels = data.map((row) => parseInt(row.Churn_Label));
+
+				data.forEach((row) => {
+					if (row.Churn_Label === 1 || row.Churn_Label === "1")
+						churnCounts.churn++;
+					else churnCounts.noChurn++;
+					probabilities.push(parseFloat(row.Churn_Probability));
+				});
+
+				// Destroy old charts before creating new ones
+				if (churnPieChart) churnPieChart.destroy();
+				if (probabilityHistogram) probabilityHistogram.destroy();
+				if (churnLabelPerCustomer) churnLabelPerCustomer.destroy();
+
+				// Churn Pie Chart
+				churnPieChart = new Chart(document.getElementById("churnPieChart"), {
+					type: "pie",
+					data: {
+						labels: ["Churn", "No Churn"],
+						datasets: [
+							{
+								data: [churnCounts.churn, churnCounts.noChurn],
+								backgroundColor: ["#e74c3c", "#2ecc71"],
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						plugins: { title: { display: true, text: "Churn Distribution" } },
+					},
+				});
+
+				// Probability Histogram
+				probabilityHistogram = new Chart(
+					document.getElementById("probabilityHistogram"),
+					{
+						type: "bar",
+						data: {
+							labels: probabilities.map((_, i) => `Customer ${i + 1}`),
+							datasets: [
+								{
+									label: "Churn Probability",
+									data: probabilities,
+									backgroundColor: "#3498db",
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							scales: { y: { beginAtZero: true, max: 1 } },
+							plugins: {
+								title: {
+									display: true,
+									text: "Churn Probabilities by Customer",
+								},
+							},
+						},
+					}
+				);
+
+				// Churn Label Per Customer Chart
+				churnLabelPerCustomer = new Chart(
+					document.getElementById("churnLabelPerCustomer"),
+					{
+						type: "bar",
+						data: {
+							labels: churnLabels.map((_, i) => `Customer ${i + 1}`),
+							datasets: [
+								{
+									label: "Churn Label (0 = No, 1 = Yes)",
+									data: churnLabels,
+									backgroundColor: churnLabels.map((v) => "#2ecc71"),
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							scales: {
+								y: {
+									beginAtZero: true,
+									ticks: { stepSize: 1, callback: (val) => val },
+								},
+							},
+							plugins: {
+								title: { display: true, text: "Churn Label per Customer" },
+							},
+						},
+					}
+				);
+			});
+		</script>
+	</body>
+</html>
